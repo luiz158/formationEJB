@@ -15,5 +15,6 @@
       <property name="eclipselink.logging.level" value="INFO"/>
       <property name="javax.persistence.schema-generation.database.action" value="drop-and-create"/>
     </properties>
+    <mapping-file>META-INF/common_mapping.xml</mapping-file>
   </persistence-unit>
 </persistence>

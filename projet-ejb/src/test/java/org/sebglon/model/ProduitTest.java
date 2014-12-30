@@ -19,6 +19,7 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.sebglon.modele.CategorieProduit;
 
 /**
  *
@@ -57,7 +58,7 @@ public class ProduitTest {
 
     @Test
     public void createProduit() throws Exception{
-        Produit produit = new Produit("Produit A1", "TV", Calendar.getInstance());
+        Produit produit = new Produit("Produit A1", CategorieProduit.TV, Calendar.getInstance());
         Fournisseur fournisseur = new Fournisseur();
         fournisseur.setLibelle("Fournisseur 1");
         produit.setFournisseur(fournisseur);
@@ -70,5 +71,7 @@ public class ProduitTest {
         
         // Récupération des produits en base
         List<Produit> produits = em.createNamedQuery(Produit.Q_FINDALL).getResultList();
+        assertNotNull(produits);
+        assertFalse("Ne doit pas être vide", produits.isEmpty());
     }
 }

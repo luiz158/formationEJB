@@ -12,6 +12,8 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -20,9 +22,15 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
+import javax.persistence.PostLoad;
+import javax.persistence.PostPersist;
+import javax.persistence.PostUpdate;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -57,11 +65,10 @@ public class Produit implements Serializable {
     @Column(name = "LIBELLE", nullable = false, length = 255)
     private String libelle;
 
-    @Basic(optional = false)
+    @Enumerated(EnumType.STRING)
     @NotNull
-    @Size(min = 1, max = 255)
     @Column(name = "CATEGORIE", nullable = false, length = 255)
-    private String categorie;
+    private CategorieProduit categorie;
 
     @Basic(optional = false)
     @NotNull
@@ -73,18 +80,49 @@ public class Produit implements Serializable {
     @Temporal(TemporalType.TIME)
     private Calendar maj;
 
-//    @OneToOne(cascade = CascadeType.ALL, mappedBy = "produit")
-//    private DetailProduit detailProduit;
-
     @NotNull
     @JoinColumn(name = "ID_FOURNISSEUR", referencedColumnName = "ID", nullable = false)
     @ManyToOne
     private Fournisseur fournisseur;
+    
+    @Transient
+    private Integer age;
 
-    public Produit() {
+    
+    @PrePersist
+    private void udateDateCreation() {
+        dateCreation = Calendar.getInstance();
+        validate();
+    }
+    
+    @PreUpdate
+    private void updateMaj() {
+        maj = Calendar.getInstance();
+        validate();
+    }
+    
+
+    private void validate() {
+        if (maj !=null && dateCreation.getTime().after(maj.getTime()) ) {
+            throw new IllegalArgumentException("La date de MAJ ne peut être intéfieur à la date de création");
+        }
+    }
+    
+    @PostLoad
+    @PostPersist
+    @PostUpdate
+    public void calculAge() {
+        if (dateCreation==null) {
+            age = 0;
+        } else {   
+            age = (Calendar.getInstance().getTime().compareTo(dateCreation.getTime())) / (1000 * 60 * 60 * 24);
+        }
+    }
+    
+    protected Produit() {
     }
 
-    public Produit(String libelle, String categorie, Calendar dateCreation) {
+    public Produit(String libelle, CategorieProduit categorie, Calendar dateCreation) {
         this.libelle = libelle;
         this.categorie = categorie;
         this.dateCreation = dateCreation;
@@ -106,11 +144,11 @@ public class Produit implements Serializable {
         this.libelle = libelle;
     }
 
-    public String getCategorie() {
+    public CategorieProduit getCategorie() {
         return categorie;
     }
 
-    public void setCategorie(String categorie) {
+    public void setCategorie(CategorieProduit categorie) {
         this.categorie = categorie;
     }
 
@@ -136,6 +174,14 @@ public class Produit implements Serializable {
 
     public void setFournisseur(Fournisseur fournisseur) {
         this.fournisseur = fournisseur;
+    }
+
+    public Integer getAge() {
+        return age;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
     }
 
     @Override

@@ -16,6 +16,7 @@ import javax.ejb.LocalBean;
 public class NewSessionBean {
 
     public void businessMethod() {
+        System.out.println("Hello Student");
     }
 
     // Add business logic below. (Right-click in editor and choose
