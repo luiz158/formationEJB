@@ -4,3 +4,8 @@ pom.xml.releaseBackup
 pom.xml.versionsBackup
 pom.xml.next
 release.properties
+derby.log
+nb-configuration.xml
+glassfish-resources.xml
+glassfish-application.xml
+MANIFEST.MF
